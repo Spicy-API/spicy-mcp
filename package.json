@@ -1,0 +1,64 @@
+{
+  "name": "@spicyapi/mcp",
+  "version": "0.4.3",
+  "description": "Official local MCP server for the SpicyAPI public API",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Spicy-API/spicy-mcp.git"
+  },
+  "homepage": "https://spicyapi.ai",
+  "bugs": {
+    "url": "https://github.com/Spicy-API/spicy-mcp/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "main": "./dist/src/mcp/server.js",
+  "types": "./dist/src/mcp/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/mcp/server.d.ts",
+      "import": "./dist/src/mcp/server.js"
+    },
+    "./stdio": {
+      "types": "./dist/src/mcp/stdio.d.ts",
+      "import": "./dist/src/mcp/stdio.js"
+    },
+    "./http": {
+      "types": "./dist/src/mcp/http.d.ts",
+      "import": "./dist/src/mcp/http.js"
+    }
+  },
+  "bin": {
+    "spicyapi-mcp": "dist/src/mcp/stdio.js",
+    "spicyapi-mcp-http": "dist/src/mcp/http.js"
+  },
+  "files": [
+    "dist/src",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/generate-package-version.mjs && tsc -p tsconfig.json",
+    "typecheck": "node scripts/generate-package-version.mjs && tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test dist/test/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/node": "2.0.0",
+    "@modelcontextprotocol/server": "2.0.0",
+    "@spicyapi/sdk": "^0.7.0",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.0.0",
+    "@types/node": "26.4.0",
+    "prettier": "3.9.6",
+    "typescript": "5.9.3"
+  }
+}
