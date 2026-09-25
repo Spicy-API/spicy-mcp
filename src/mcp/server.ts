@@ -122,7 +122,7 @@ const apiModelSchema = z
       .describe(
         "Informational model policy metadata; not a platform routing or access gate. " +
           "Known values: unrestricted, borderline, softened, filtered, unspecified. " +
-          "softened means the model quietly returns a tamer result and the task is still charged. " +
+          "softened means the model quietly returns a toned-down result and the task is still charged. " +
           "Treat the set as open and ignore a value you do not recognise.",
       ),
     taskTimeoutSeconds: z.number().int().positive(),
