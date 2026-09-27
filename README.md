@@ -391,6 +391,29 @@ lists the roots in effect.
 | `SPICY_MCP_HTTP_TOKEN`   | `spicyapi-mcp-http` | Required bearer token, at least 32 bytes, different from `SPICY_API_KEY`                                |
 | `SPICY_MCP_HOST`         | `spicyapi-mcp-http` | `127.0.0.1` (default), `localhost` or `::1`; anything else is refused                                   |
 | `SPICY_MCP_PORT`         | `spicyapi-mcp-http` | Port, default `8765`                                                                                    |
+| `HTTPS_PROXY`            | both entrypoints    | Send API calls through this proxy; see [Behind a proxy](#behind-a-proxy)                                |
+
+## Behind a proxy
+
+If your network reaches the internet through an HTTP proxy, put `HTTPS_PROXY` (and `NO_PROXY`, if
+you need it) in the server's `env` block. The server uses it on its own on Node.js 22.21+ or 24+.
+Node.js's built-in `fetch` ignores proxy variables unless it was started with
+`NODE_USE_ENV_PROXY=1`, so when the server finds an `http://` or `https://` proxy it restarts itself
+once with that switch on. Set `NODE_USE_ENV_PROXY=0` to always connect directly.
+
+Put it in the `env` block rather than relying on your shell. Desktop apps do not see the variables
+you export in a terminal, and Codex passes only a short fixed list of them to MCP servers:
+
+```bash
+codex mcp add spicyapi \
+  --env SPICY_API_KEY=$SPICY_API_KEY \
+  --env HTTPS_PROXY=http://127.0.0.1:7890 \
+  -- npx --yes --package=@spicyapi/mcp spicyapi-mcp
+```
+
+A proxy that `curl` in your terminal uses and this server does not is the usual reason `curl`
+reaches the API while the server reports `network request failed`. Errors then say so: they name
+the proxy variable that was set and not used. `socks5://` proxies are not supported.
 
 ## HTTP entrypoint
 
@@ -422,8 +445,10 @@ Loopback means only programs on the same computer can connect — not other devi
 | `npx: command not found` / `spawn npx ENOENT`                            | Install Node.js from nodejs.org, or use the absolute path from `which npx` / `where npx`; on Windows try `"command": "cmd"` with `/c npx …` args      |
 | `could not determine executable to run`                                  | Add `--package=@spicyapi/mcp` before `spicyapi-mcp`                                                                                                   |
 | `SPICY_API_KEY is required for authenticated API operations`             | The key is not reaching the server: fix the `env` block, or re-add the server from a shell where the key is exported                                  |
+| `HTTPS_PROXY is set, but this request did not use it`                    | Update Node.js to 22.21+ or 24+, or add `NODE_USE_ENV_PROXY=1` to the `env` block; see [Behind a proxy](#behind-a-proxy)                              |
 | `401`                                                                    | Key mistyped, revoked or expired — create a new key                                                                                                   |
 | `40201` / `40202` / `40301`                                              | Top up; raise the key's cap or wait for the UTC reset; allow the model on the key                                                                     |
+| `40310`                                                                  | Verify your account email: open the link we sent, or send a new one from the console                                                                  |
 | `40003`                                                                  | The uploaded bytes do not match their ticket; call `spicyapi_upload_file` again and use the new `spicy://` URI                                        |
 | `40004`                                                                  | No deployment can serve that exact combination of settings; change the parameter named in the message against the model's schema, do not just retry   |
 | `503`                                                                    | A dependency is briefly unavailable; wait for `Retry-After`, then repeat the call                                                                     |

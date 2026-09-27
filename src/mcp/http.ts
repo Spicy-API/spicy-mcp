@@ -12,6 +12,7 @@ import {
 import { createMcpHandler } from "@modelcontextprotocol/server";
 
 import { isMainModule } from "../runtime/entrypoint.js";
+import { relaunchWithEnvProxy, shouldRelaunchWithEnvProxy } from "../runtime/env-proxy.js";
 import { createSpicyMcpFactory, type SpicyMcpFactoryOptions } from "./server.js";
 
 const MAX_MCP_BODY_BYTES = 2 * 1_024 * 1_024;
@@ -194,6 +195,8 @@ export async function startHttpServer(
 }
 
 if (isMainModule(import.meta.url)) {
+  // Honor HTTPS_PROXY the way curl in the same shell does; Node.js fetch alone would not.
+  if (shouldRelaunchWithEnvProxy()) await relaunchWithEnvProxy();
   const handle = await startHttpServer();
   console.error(`SpicyAPI MCP HTTP listening at ${handle.url}`);
   const close = (): void => {

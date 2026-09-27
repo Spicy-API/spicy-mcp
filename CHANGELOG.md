@@ -1,5 +1,22 @@
 # @spicyapi/mcp
 
+## 0.4.6
+
+### Patch Changes
+
+- Honor `HTTPS_PROXY`, `HTTP_PROXY` and `NO_PROXY` in both entrypoints. Node.js's built-in `fetch`
+  ignores them unless the process starts with `NODE_USE_ENV_PROXY=1`, and nothing can switch that
+  on afterwards, so a client whose shell reached the API through a proxy saw every tool call go out
+  directly and fail. On Node.js 22.21+ or 24+, when a proxy variable holds an `http://` or
+  `https://` URL, the server now restarts itself once with the switch on. The restarted process
+  shares stdin, stdout and stderr, so stdio clients talk to it unchanged, and `SIGINT`, `SIGTERM`
+  and `SIGHUP` are forwarded so stopping the server stops both. `NODE_USE_ENV_PROXY=0` opts out. A
+  `socks5://` or bare `host:port` value is left alone, because Node.js refuses to start with it
+  once the switch is on.
+- Document proxy setup, including that Codex passes only a short fixed list of environment
+  variables to MCP servers, so `HTTPS_PROXY` belongs in the server's `env`. Add `40310` (account
+  email not verified yet) to the troubleshooting table.
+
 ## 0.4.2
 
 ### Patch Changes
